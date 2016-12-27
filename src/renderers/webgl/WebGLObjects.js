@@ -5,257 +5,263 @@
 import { BufferAttribute } from '../../core/BufferAttribute';
 import { WebGLGeometries } from './WebGLGeometries';
 
-function WebGLObjects( gl, properties, info ) {
+function WebGLObjects(gl, properties, info) {
 
-	var geometries = new WebGLGeometries( gl, properties, info );
+    var geometries = new WebGLGeometries(gl, properties, info);
 
-	//
+    //
 
-	function update( object ) {
+    function update(object) {
 
-		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
+        // TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
-		var geometry = geometries.get( object );
+        var geometry = geometries.get(object);
 
-		if ( object.geometry.isGeometry ) {
+        if (geometry.ticket === this.renderTicket)
+            return geometry;
 
-			geometry.updateFromObject( object );
+        geometry.ticket = this.renderTicket;
 
-		}
 
-		var index = geometry.index;
-		var attributes = geometry.attributes;
+        if (object.geometry.isGeometry) {
 
-		if ( index !== null ) {
+            geometry.updateFromObject(object);
 
-			updateAttribute( index, gl.ELEMENT_ARRAY_BUFFER );
+        }
 
-		}
+        var index = geometry.index;
+        var attributes = geometry.attributes;
 
-		for ( var name in attributes ) {
+        if (index !== null) {
 
-			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
+            updateAttribute(index, gl.ELEMENT_ARRAY_BUFFER);
 
-		}
+        }
 
-		// morph targets
+        for (var name in attributes) {
 
-		var morphAttributes = geometry.morphAttributes;
+            updateAttribute(attributes[name], gl.ARRAY_BUFFER);
 
-		for ( var name in morphAttributes ) {
+        }
 
-			var array = morphAttributes[ name ];
+        // morph targets
 
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
+        var morphAttributes = geometry.morphAttributes;
 
-				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
+        for (var name in morphAttributes) {
 
-			}
+            var array = morphAttributes[name];
 
-		}
+            for (var i = 0, l = array.length; i < l; i++) {
 
-		return geometry;
+                updateAttribute(array[i], gl.ARRAY_BUFFER);
 
-	}
+            }
 
-	function updateAttribute( attribute, bufferType ) {
+        }
 
-		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
+        return geometry;
 
-		var attributeProperties = properties.get( data );
+    }
 
-		if ( attributeProperties.__webglBuffer === undefined ) {
+    function updateAttribute(attribute, bufferType) {
 
-			createBuffer( attributeProperties, data, bufferType );
+        var data = (attribute.isInterleavedBufferAttribute) ? attribute.data : attribute;
 
-		} else if ( attributeProperties.version !== data.version ) {
+        var attributeProperties = properties.get(data);
 
-			updateBuffer( attributeProperties, data, bufferType );
+        if (attributeProperties.__webglBuffer === undefined) {
 
-		}
+            createBuffer(attributeProperties, data, bufferType);
 
-	}
+        } else if (attributeProperties.version !== data.version) {
 
-	function createBuffer( attributeProperties, data, bufferType ) {
+            updateBuffer(attributeProperties, data, bufferType);
 
-		attributeProperties.__webglBuffer = gl.createBuffer();
-		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+        }
 
-		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+    }
 
-		gl.bufferData( bufferType, data.array, usage );
+    function createBuffer(attributeProperties, data, bufferType) {
 
-		var type = gl.FLOAT;
-		var array = data.array;
+        attributeProperties.__webglBuffer = gl.createBuffer();
+        gl.bindBuffer(bufferType, attributeProperties.__webglBuffer);
 
-		if ( array instanceof Float32Array ) {
+        var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
-			type = gl.FLOAT;
+        gl.bufferData(bufferType, data.array, usage);
 
-		} else if ( array instanceof Float64Array ) {
+        var type = gl.FLOAT;
+        var array = data.array;
 
-			console.warn( "Unsupported data buffer format: Float64Array" );
+        if (array instanceof Float32Array) {
 
-		} else if ( array instanceof Uint16Array ) {
+            type = gl.FLOAT;
 
-			type = gl.UNSIGNED_SHORT;
+        } else if (array instanceof Float64Array) {
 
-		} else if ( array instanceof Int16Array ) {
+            console.warn("Unsupported data buffer format: Float64Array");
 
-			type = gl.SHORT;
+        } else if (array instanceof Uint16Array) {
 
-		} else if ( array instanceof Uint32Array ) {
+            type = gl.UNSIGNED_SHORT;
 
-			type = gl.UNSIGNED_INT;
+        } else if (array instanceof Int16Array) {
 
-		} else if ( array instanceof Int32Array ) {
+            type = gl.SHORT;
 
-			type = gl.INT;
+        } else if (array instanceof Uint32Array) {
 
-		} else if ( array instanceof Int8Array ) {
+            type = gl.UNSIGNED_INT;
 
-			type = gl.BYTE;
+        } else if (array instanceof Int32Array) {
 
-		} else if ( array instanceof Uint8Array ) {
+            type = gl.INT;
 
-			type = gl.UNSIGNED_BYTE;
+        } else if (array instanceof Int8Array) {
 
-		}
+            type = gl.BYTE;
 
-		attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
-		attributeProperties.type = type;
-		attributeProperties.version = data.version;
+        } else if (array instanceof Uint8Array) {
 
-		data.onUploadCallback();
+            type = gl.UNSIGNED_BYTE;
 
-	}
+        }
 
-	function updateBuffer( attributeProperties, data, bufferType ) {
+        attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
+        attributeProperties.type = type;
+        attributeProperties.version = data.version;
 
-		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+        data.onUploadCallback();
 
-		if ( data.dynamic === false ) {
+    }
 
-			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+    function updateBuffer(attributeProperties, data, bufferType) {
 
-		} else if ( data.updateRange.count === - 1 ) {
+        gl.bindBuffer(bufferType, attributeProperties.__webglBuffer);
 
-			// Not using update ranges
+        if (data.dynamic === false) {
 
-			gl.bufferSubData( bufferType, 0, data.array );
+            gl.bufferData(bufferType, data.array, gl.STATIC_DRAW);
 
-		} else if ( data.updateRange.count === 0 ) {
+        } else if (data.updateRange.count === -1) {
 
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
+            // Not using update ranges
 
-		} else {
+            gl.bufferSubData(bufferType, 0, data.array);
 
-			gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-							  data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+        } else if (data.updateRange.count === 0) {
 
-			data.updateRange.count = 0; // reset range
+            console.error('THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.');
 
-		}
+        } else {
 
-		attributeProperties.version = data.version;
+            gl.bufferSubData(bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+                data.array.subarray(data.updateRange.offset, data.updateRange.offset + data.updateRange.count));
 
-	}
+            data.updateRange.count = 0; // reset range
 
-	function getAttributeBuffer( attribute ) {
+        }
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+        attributeProperties.version = data.version;
 
-			return properties.get( attribute.data ).__webglBuffer;
+    }
 
-		}
+    function getAttributeBuffer(attribute) {
 
-		return properties.get( attribute ).__webglBuffer;
+        if (attribute.isInterleavedBufferAttribute) {
 
-	}
+            return properties.get(attribute.data).__webglBuffer;
 
-	function getAttributeProperties( attribute ) {
+        }
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+        return properties.get(attribute).__webglBuffer;
 
-			return properties.get( attribute.data );
+    }
 
-		}
+    function getAttributeProperties(attribute) {
 
-		return properties.get( attribute );
+        if (attribute.isInterleavedBufferAttribute) {
 
-	}
+            return properties.get(attribute.data);
 
-	function getWireframeAttribute( geometry ) {
+        }
 
-		var property = properties.get( geometry );
+        return properties.get(attribute);
 
-		if ( property.wireframe !== undefined ) {
+    }
 
-			return property.wireframe;
+    function getWireframeAttribute(geometry) {
 
-		}
+        var property = properties.get(geometry);
 
-		var indices = [];
+        if (property.wireframe !== undefined) {
 
-		var index = geometry.index;
-		var attributes = geometry.attributes;
-		var position = attributes.position;
+            return property.wireframe;
 
-		// console.time( 'wireframe' );
+        }
 
-		if ( index !== null ) {
+        var indices = [];
 
-			var edges = {};
-			var array = index.array;
+        var index = geometry.index;
+        var attributes = geometry.attributes;
+        var position = attributes.position;
 
-			for ( var i = 0, l = array.length; i < l; i += 3 ) {
+        // console.time( 'wireframe' );
 
-				var a = array[ i + 0 ];
-				var b = array[ i + 1 ];
-				var c = array[ i + 2 ];
+        if (index !== null) {
 
-				indices.push( a, b, b, c, c, a );
+            var edges = {};
+            var array = index.array;
 
-			}
+            for (var i = 0, l = array.length; i < l; i += 3) {
 
-		} else {
+                var a = array[i + 0];
+                var b = array[i + 1];
+                var c = array[i + 2];
 
-			var array = attributes.position.array;
+                indices.push(a, b, b, c, c, a);
 
-			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+            }
 
-				var a = i + 0;
-				var b = i + 1;
-				var c = i + 2;
+        } else {
 
-				indices.push( a, b, b, c, c, a );
+            var array = attributes.position.array;
 
-			}
+            for (var i = 0, l = (array.length / 3) - 1; i < l; i += 3) {
 
-		}
+                var a = i + 0;
+                var b = i + 1;
+                var c = i + 2;
 
-		// console.timeEnd( 'wireframe' );
+                indices.push(a, b, b, c, c, a);
 
-		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-		var attribute = new BufferAttribute( new TypeArray( indices ), 1 );
+            }
 
-		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
+        }
 
-		property.wireframe = attribute;
+        // console.timeEnd( 'wireframe' );
 
-		return attribute;
+        var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
+        var attribute = new BufferAttribute(new TypeArray(indices), 1);
 
-	}
+        updateAttribute(attribute, gl.ELEMENT_ARRAY_BUFFER);
 
-	return {
+        property.wireframe = attribute;
 
-		getAttributeBuffer: getAttributeBuffer,
-		getAttributeProperties: getAttributeProperties,
-		getWireframeAttribute: getWireframeAttribute,
+        return attribute;
 
-		update: update
+    }
 
-	};
+    return {
+
+        getAttributeBuffer: getAttributeBuffer,
+        getAttributeProperties: getAttributeProperties,
+        getWireframeAttribute: getWireframeAttribute,
+
+        update: update
+
+    };
 
 }
 
