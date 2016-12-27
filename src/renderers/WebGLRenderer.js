@@ -692,6 +692,9 @@ function WebGLRenderer(parameters) {
 
     this.renderBufferDirect = function(camera, fog, geometry, material, object, group) {
 
+        if (!geometry)
+            geometry = objects.update(object);
+
         setMaterial(material);
 
         var program = setProgram(camera, fog, material, object);
@@ -1105,6 +1108,9 @@ function WebGLRenderer(parameters) {
         properties.clear();
     };
 
+    this.setupLights = function(lights, camera) {
+        setupLights(lights, camera);
+    };
     this.renderByIncrement = function(scene, camera, renderTarget, forceClear) {
 
         // reset caching for this frame
