@@ -4,39 +4,39 @@
 
 function WebGLProperties() {
 
-	var properties = {};
+    var properties = {};
 
-	return {
+    return {
 
-		get: function ( object ) {
+        get: function(object) {
 
-			var uuid = object.uuid;
-			var map = properties[ uuid ];
+            var uuid = object.uuid;
+            var map = properties[uuid];
 
-			if ( map === undefined ) {
+            if (map === undefined) {
 
-				map = {};
-				properties[ uuid ] = map;
+                map = {};
+                properties[uuid] = map;
 
-			}
+            }
 
-			return map;
+            return map;
 
-		},
+        },
 
-		delete: function ( object ) {
+        delete: function(object) {
 
-			delete properties[ object.uuid ];
+            properties[object.uuid] = undefined;
 
-		},
+        },
 
-		clear: function () {
+        clear: function() {
 
-			properties = {};
+            properties = {};
 
-		}
+        }
 
-	};
+    };
 
 }
 
