@@ -72,9 +72,9 @@
 
 				// add box 1 - grey8 texture
 				var texture1 = loader.load( 'textures/crate_grey8.tga' );
+				texture1.setRotateAngle(30);
 
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
-				material1.setMapRotateAngle(30);
 
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
 				var mesh1 = new THREE.Mesh( geometry, material1 );

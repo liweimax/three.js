@@ -2099,6 +2099,7 @@ function WebGLRenderer(parameters) {
             var repeat = uvScaleMap.repeat;
 
             uniforms.offsetRepeat.value.set(offset.x, offset.y, repeat.x, repeat.y);
+            uniforms.rotateMatrix.v = uvScaleMap.rotateMatrix;
 
         }
 
@@ -2181,12 +2182,6 @@ function WebGLRenderer(parameters) {
 
         uniforms.specular.value = material.specular;
         uniforms.shininess.value = Math.max(material.shininess, 1e-4); // to prevent pow( 0.0, 0.0 )
-
-        if (material.mapRotateMatrix != null) {
-
-            uniforms.mapRotateMatrix.value = material.mapRotateMatrix;
-
-        }
 
         if (material.emissiveMap) {
 

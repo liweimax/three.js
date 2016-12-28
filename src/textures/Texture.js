@@ -3,6 +3,7 @@ import { UVMapping } from '../constants';
 import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
 import { _Math } from '../math/Math';
 import { Vector2 } from '../math/Vector2';
+import { Matrix3 } from '../math/Matrix3';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -39,7 +40,9 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
 
-	this.generateMipmaps = true;
+    this.rotateMatrix = new Matrix3();
+
+    this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
@@ -97,6 +100,8 @@ Texture.prototype = {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+
+		this.rotateMatrix.copy( source.rotateMatrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -281,6 +286,17 @@ Texture.prototype = {
 
 		}
 
+	},
+
+    setRotateAngle: function (angle) {
+		var radAngle = THREE.Math.degToRad(angle);
+		var s = Math.sin(radAngle);
+		var c = Math.cos(radAngle);
+
+		this.rotateMatrix.elements[0] = c;
+		this.rotateMatrix.elements[1] = -s;
+		this.rotateMatrix.elements[3] = s;
+		this.rotateMatrix.elements[4] = c;
 	}
 
 };

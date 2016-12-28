@@ -17,6 +17,7 @@ var UniformsLib = {
 
 		map: { value: null },
 		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
+		rotateMatrix: { value: new Matrix3() },
 
 		specularMap: { value: null },
 		alphaMap: { value: null },
@@ -27,10 +28,6 @@ var UniformsLib = {
 		refractionRatio: { value: 0.98 }
 
 	},
-
-    maprotatematrix: {
-        mapRotateMatrix: { value: new Matrix3() }
-    },
 
 	aomap: {
 

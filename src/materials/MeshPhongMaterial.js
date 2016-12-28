@@ -64,7 +64,6 @@ function MeshPhongMaterial( parameters ) {
 	this.shininess = 30;
 
 	this.map = null;
-    this.mapRotateMatrix = new THREE.Matrix3();
 
 	this.lightMap = null;
 	this.lightMapIntensity = 1.0;
@@ -122,7 +121,6 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.shininess = source.shininess;
 
 	this.map = source.map;
-    this.mapRotateMatrix = source.mapRotateMatrix;
 
 	this.lightMap = source.lightMap;
 	this.lightMapIntensity = source.lightMapIntensity;
@@ -164,17 +162,6 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 
 	return this;
 
-};
-
-MeshPhongMaterial.prototype.setMapRotateAngle = function (angle) {
-    var radAngle = THREE.Math.degToRad(angle);
-    var s = Math.sin(radAngle);
-    var c = Math.cos(radAngle);
-
-    this.mapRotateMatrix.elements[0] = c;
-    this.mapRotateMatrix.elements[1] = -s;
-    this.mapRotateMatrix.elements[3] = s;
-    this.mapRotateMatrix.elements[4] = c;
 };
 
 export { MeshPhongMaterial };
