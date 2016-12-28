@@ -692,6 +692,9 @@ function WebGLRenderer(parameters) {
 
     this.renderBufferDirect = function(camera, fog, geometry, material, object, group) {
 
+        if (!geometry)
+            geometry = objects.update(object);
+
         setMaterial(material);
 
         var program = setProgram(camera, fog, material, object);
@@ -1095,7 +1098,7 @@ function WebGLRenderer(parameters) {
     };
 
     this.setRenderTicket = function(ticket) {
-        objects.renderTicket = ticket;
+        objects.setRenderTicket(ticket);
     };
 
     this.destroy = function() {
@@ -1105,6 +1108,9 @@ function WebGLRenderer(parameters) {
         properties.clear();
     };
 
+    this.setupLights = function(lights, camera) {
+        setupLights(lights, camera);
+    };
     this.renderByIncrement = function(scene, camera, renderTarget, forceClear) {
 
         // reset caching for this frame
@@ -2175,6 +2181,12 @@ function WebGLRenderer(parameters) {
 
         uniforms.specular.value = material.specular;
         uniforms.shininess.value = Math.max(material.shininess, 1e-4); // to prevent pow( 0.0, 0.0 )
+
+        if (material.mapRotateMatrix != null) {
+
+            uniforms.mapRotateMatrix.value = material.mapRotateMatrix;
+
+        }
 
         if (material.emissiveMap) {
 

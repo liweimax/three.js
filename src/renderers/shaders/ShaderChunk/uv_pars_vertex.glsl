@@ -2,5 +2,6 @@
 
 	varying vec2 vUv;
 	uniform vec4 offsetRepeat;
+	uniform mat3 mapRotateMatrix;
 
 #endif

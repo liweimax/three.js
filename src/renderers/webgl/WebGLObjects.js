@@ -8,8 +8,11 @@ import { WebGLGeometries } from './WebGLGeometries';
 function WebGLObjects(gl, properties, info) {
 
     var geometries = new WebGLGeometries(gl, properties, info);
-
-    //
+    var renderTicket = 0;
+    
+    function setRenderTicket(ticket){
+        renderTicket = ticket;
+    }
 
     function update(object) {
 
@@ -17,10 +20,10 @@ function WebGLObjects(gl, properties, info) {
 
         var geometry = geometries.get(object);
 
-        if (geometry.ticket === this.renderTicket)
+        if (geometry.ticket === renderTicket)
             return geometry;
 
-        geometry.ticket = this.renderTicket;
+        geometry.ticket = renderTicket;
 
 
         if (object.geometry.isGeometry) {
@@ -259,8 +262,8 @@ function WebGLObjects(gl, properties, info) {
         getAttributeProperties: getAttributeProperties,
         getWireframeAttribute: getWireframeAttribute,
 
-        update: update
-
+        update: update,
+        setRenderTicket:setRenderTicket
     };
 
 }
