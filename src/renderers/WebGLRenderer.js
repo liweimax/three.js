@@ -1098,7 +1098,7 @@ function WebGLRenderer(parameters) {
     };
 
     this.setRenderTicket = function(ticket) {
-        objects.renderTicket = ticket;
+        objects.setRenderTicket(ticket);
     };
 
     this.destroy = function() {
