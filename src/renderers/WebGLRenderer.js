@@ -2099,7 +2099,7 @@ function WebGLRenderer(parameters) {
             var repeat = uvScaleMap.repeat;
 
             uniforms.offsetRepeat.value.set(offset.x, offset.y, repeat.x, repeat.y);
-            uniforms.rotateMatrix.v = uvScaleMap.rotateMatrix;
+            uniforms.rotateMatrix.value.copy(uvScaleMap.rotateMatrix);
 
         }
 
