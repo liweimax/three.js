@@ -1129,6 +1129,9 @@ function WebGLRenderer(parameters) {
 
         camera.matrixWorldInverse.getInverse(camera.matrixWorld);
 
+        _localClippingEnabled = this.localClippingEnabled;
+        _clippingEnabled = _clipping.init(this.clippingPlanes, _localClippingEnabled, camera);
+
         _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
         _frustum.setFromMatrix(_projScreenMatrix);
 
