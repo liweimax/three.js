@@ -23,7 +23,7 @@ function WebGLGeometries( gl, properties, info ) {
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		delete geometries[ geometry.id ];
+		geometries[ geometry.id ] = undefined;
 
 		// TODO
 
