@@ -294,8 +294,8 @@ Texture.prototype = {
 		var c = Math.cos(radAngle);
 
 		this.rotateMatrix.elements[0] = c;
-		this.rotateMatrix.elements[1] = -s;
-		this.rotateMatrix.elements[3] = s;
+		this.rotateMatrix.elements[1] = s;
+		this.rotateMatrix.elements[3] = -s;
 		this.rotateMatrix.elements[4] = c;
 	}
 
