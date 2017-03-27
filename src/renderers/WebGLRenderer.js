@@ -1103,7 +1103,7 @@ function WebGLRenderer(parameters) {
 
     this.destroy = function() {
         // WebGLObjects has no method to clear the cached geometries, so recreate it.
-        objects = new THREE.WebGLObjects(_gl, properties, this.info);
+        //objects = new THREE.WebGLObjects(_gl, properties, this.info);
         incrementRenderer.destroy();
         properties.clear();
     };
