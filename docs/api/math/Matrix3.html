@@ -38,8 +38,8 @@ m.elements = [ 11, 21, 31,
 		</code>
 		and internally all calculations are performed using column-major ordering. However, as the actual ordering
 		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
-		the Three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the transpose of any matrices outlined here to make sense of the calculations.
+		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
+		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
 		</div>
 
 		<h2>Constructor</h2>
@@ -79,16 +79,6 @@ m.elements = [ 11, 21, 31,
 		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
 		</div>
 
-		<h3>[method:Array applyToVector3Array]( [page:Array array], [page:Number offset], [page:Number length] )</h3>
-		<div>
-		[page:Array array] - An array of floats in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...],
-		that represent 3D vectors.<br />
-		[page:Number offset] - (optional) index in the array of the first vector's x component. Default is 0.<br />
-		[page:Number length] - (optional) index in the array of the last vector's z component.
-		Default is the last element in the array.<br /><br />
-
-		Multiplies (applies) this matrix to every 3D vector in the [page:Array array].
-		</div>
 
 		<h3>[method:Matrix3 clone]()</h3>
 		<div>Creates a new Matrix3 and with identical elements to this one.</div>
@@ -101,6 +91,9 @@ m.elements = [ 11, 21, 31,
 		Computes and returns the
 		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
 		</div>
+
+		<h3>[method:Boolean equals]( [page:Matrix3 m] )</h3>
+		<div>Return true if this matrix and [page:Matrix3 m] are equal.</div>
 
 		<h3>[method:Matrix3 fromArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
@@ -142,6 +135,12 @@ m.elements = [ 11, 21, 31,
 
 		</div>
 
+		<h3>[method:Matrix3 multiply]( [page:Matrix3 m] )</h3>
+		<div>Post-multiplies this matrix by [page:Matrix3 m].</div>
+
+		<h3>[method:Matrix3 multiplyMatrices]( [page:Matrix3 a], [page:Matrix3 b] )</h3>
+		<div>Sets this matrix to [page:Matrix3 a] x [page:Matrix3 b].</div>
+
 		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] )</h3>
 		<div>Multiplies every component of the matrix by the scalar value *s*.</div>
 
@@ -164,8 +163,28 @@ m.elements = [ 11, 21, 31,
 		sequence of values.
 		</div>
 
+		<h3>[method:Matrix3 premultiply]( [page:Matrix3 m] )</h3>
+		<div>Pre-multiplies this matrix by [page:Matrix3 m].</div>
+
 		<h3>[method:Matrix3 setFromMatrix4]( [page:Matrix4 m] )</h3>
 		<div>Set this matrx to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</div>
+
+		<h3>
+			[method:Matrix3 setUvTransform](
+			[page:Float tx], [page:Float ty], [page:Float sx], [page:Float sy],
+			[page:Float rotation], [page:Float cx], [page:Float cy] )
+		</h3>
+		<div>
+		[page:Float tx] - offset x<br />
+		[page:Float ty] - offset y<br />
+		[page:Float sx] - repeat x<br />
+		[page:Float sy] - repeat y<br />
+		[page:Float rotation] - rotation (in radians)<br />
+		[page:Float cx] - center x of rotation<br />
+		[page:Float cy] - center y of rotation<br /><br />
+
+		Sets the UV transform matrix from offset, repeat, rotation, and center.
+		</div>
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>

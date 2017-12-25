@@ -20,7 +20,7 @@
 				A point in 3D space.
 			</li>
 			<li>
-				A direction and length in 3D space. In Three the length will always be the
+				A direction and length in 3D space. In three.js the length will always be the
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
 				(straight-line distance) from (0, 0, 0) to (x, y, z) and the direction is also
 				measured from (0, 0, 0) towards (x, y, z).
@@ -31,7 +31,7 @@
 		</ul>
 
 		There are other things a 3D vector can be used to represent, such as momentum
-		vectors and so on, however these are the most common uses in Three.
+		vectors and so on, however these are the most common uses in three.js.
 		</div>
 
 
@@ -65,7 +65,7 @@ var d = a.distanceTo( b );
 		<div>
 			Used to check whether this or derived classes are Vector3s. Default is *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			You should not change this, as it is used internally for optimisation.
 		</div>
 
 		<h3>[property:Float x]</h3>
@@ -81,7 +81,7 @@ var d = a.distanceTo( b );
 		<div>Adds [page:Vector3 v] to this vector.</div>
 
 		<h3>[method:Vector3 addScalar]( [page:Float s] )</h3>
-		<div>Add the scalar value s to this vector's [page:.x x], [page:.y y] and [page:.z z] values.</div>
+		<div>Adds the scalar value s to this vector's [page:.x x], [page:.y y] and [page:.z z] values.</div>
 
 		<h3>[method:Vector3 addScaledVector]( [page:Vector3 v], [page:Float s] )</h3>
 		<div>Adds the multiple of [page:Vector3 v] and [page:Float s] to this vector.</div>
@@ -104,31 +104,11 @@ var d = a.distanceTo( b );
 		</div>
 
 		<h3>[method:Vector3 applyMatrix3]( [page:Matrix3 m] )</h3>
-		<div>Multiply this vector by [page:Matrix3 m]</div>
+		<div>Multiplies this vector by [page:Matrix3 m]</div>
 
 		<h3>[method:Vector3 applyMatrix4]( [page:Matrix4 m] )</h3>
 		<div>
-		Multiply this vector by 4 x 3 subset of a [page:Matrix4 m]. If [page:Matrix4 m] is:
-		<code>
-a, b, c, d,
-e, f, g, h,
-i, j, k, l,
-m, n, o, p
-		</code>
-		Then the 4 x 3 matrix will be:
-		<code>
-a, b, c,
-e, f, g,
-i, j, k,
-m, n, o
-		</code>
-		</div>
-
-		<h3>[method:Vector3 applyProjection]( [page:Matrix4 m] )</h3>
-		<div>
-		[page:Matrix4 m] - [page:Matrix4] projection matrix.<br /><br />
-
-		Multiplies this vector and m, and divides by perspective.
+		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
 		</div>
 
 		<h3>[method:Vector3 applyQuaternion]( [page:Quaternion quaternion] )</h3>
@@ -198,7 +178,7 @@ m, n, o
 		<h3>[method:Float distanceTo]( [page:Vector3 v] )</h3>
 		<div>Computes the distance from this vector to [page:Vector3 v].</div>
 
-		<h3>[method:Float distanceToManhattan]( [page:Vector3 v] )</h3>
+		<h3>[method:Float manhattanDistanceTo]( [page:Vector3 v] )</h3>
 		<div>
 		Computes the [link:https://en.wikipedia.org/wiki/Taxicab_geometry Manhattan distance] from this vector to [page:Vector3 v].
 		</div>
@@ -240,11 +220,10 @@ m, n, o
 		and [page:.z z] value to be array[ offset + 2 ].
 		</div>
 
-		<h3>[method:Vector3 fromAttribute]( [page:BufferAttribute attribute], [page:Integer index], [page:Integer offset] )</h3>
+		<h3>[method:Vector3 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
-		[page:Integer offset] - (optional) offset into the attribute. Default is 0.<br /><br />
 
 		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] values from the [page:BufferAttribute attribute].
 		</div>
@@ -262,7 +241,7 @@ m, n, o
 		<div>Computes the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
 		(straight-line length) from (0, 0, 0) to (x, y, z).</div>
 
-		<h3>[method:Float lengthManhattan]()</h3>
+		<h3>[method:Float manhattanLength]()</h3>
 		<div>
 		Computes the [link:http://en.wikipedia.org/wiki/Taxicab_geometry Manhattan length] of this vector.
 		</div>
@@ -305,13 +284,13 @@ m, n, o
 
 		<h3>[method:Vector3 max]( [page:Vector3 v] )</h3>
 		<div>
-		If this vector's x, y or z value is less than [page:Vector3 v's] x, y or z value, replace
+		If this vector's x, y or z value is less than [page:Vector3 v]'s x, y or z value, replace
 		that value with the corresponding max value.
 		</div>
 
 		<h3>[method:Vector3 min]( [page:Vector3 v] )</h3>
 		<div>
-		If this vector's x, y or z value is greater than [page:Vector3 v's] x, y or z value, replace
+		If this vector's x, y or z value is greater than [page:Vector3 v]'s x, y or z value, replace
 		that value with the corresponding min value.
 		</div>
 
@@ -322,7 +301,7 @@ m, n, o
 		<div>Multiplies this vector by scalar [page:Float s].</div>
 
 		<h3>[method:Vector3 multiplyVectors]( [page:Vector3 a], [page:Vector3 b] )</h3>
-		<div>Sets this vector equal to [page:Vector3 a] x [page:Vector3 b].</div>
+		<div>Sets this vector equal to [page:Vector3 a] * [page:Vector3 b], component-wise.</div>
 
 		<h3>[method:Vector3 project]( [page:Camera camera] )</h3>
 		<div>

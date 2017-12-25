@@ -1,14 +1,15 @@
-import { EventDispatcher } from '../core/EventDispatcher';
-import { UVMapping } from '../constants';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
-import { _Math } from '../math/Math';
-import { Vector2 } from '../math/Vector2';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  */
+
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { UVMapping } from '../constants.js';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Matrix3 } from '../math/Matrix3.js';
 
 var textureId = 0;
 
@@ -38,12 +39,16 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.center = new Vector2( 0, 0 );
+	this.rotation = 0;
+
+	this.matrixAutoUpdate = true;
+	this.matrix = new Matrix3();
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
-
 
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
@@ -59,17 +64,11 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Texture.prototype = {
+Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	constructor: Texture,
 
 	isTexture: true,
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
 
 	clone: function () {
 
@@ -78,6 +77,8 @@ Texture.prototype = {
 	},
 
 	copy: function ( source ) {
+
+		this.name = source.name;
 
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
@@ -97,6 +98,11 @@ Texture.prototype = {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.center.copy( source.center );
+		this.rotation = source.rotation;
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -110,7 +116,9 @@ Texture.prototype = {
 
 	toJSON: function ( meta ) {
 
-		if ( meta.textures[ this.uuid ] !== undefined ) {
+		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
 			return meta.textures[ this.uuid ];
 
@@ -120,7 +128,7 @@ Texture.prototype = {
 
 			var canvas;
 
-			if ( image.toDataURL !== undefined ) {
+			if ( image instanceof HTMLCanvasElement ) {
 
 				canvas = image;
 
@@ -130,7 +138,17 @@ Texture.prototype = {
 				canvas.width = image.width;
 				canvas.height = image.height;
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+				var context = canvas.getContext( '2d' );
+
+				if ( image instanceof ImageData ) {
+
+					context.putImageData( image, 0, 0 );
+
+				} else {
+
+					context.drawImage( image, 0, 0, image.width, image.height );
+
+				}
 
 			}
 
@@ -148,7 +166,7 @@ Texture.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
@@ -160,6 +178,9 @@ Texture.prototype = {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			center: [ this.center.x, this.center.y ],
+			rotation: this.rotation,
+
 			wrap: [ this.wrapS, this.wrapT ],
 
 			minFilter: this.minFilter,
@@ -181,7 +202,7 @@ Texture.prototype = {
 
 			}
 
-			if ( meta.images[ image.uuid ] === undefined ) {
+			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
@@ -194,7 +215,11 @@ Texture.prototype = {
 
 		}
 
-		meta.textures[ this.uuid ] = output;
+		if ( ! isRootObject ) {
+
+			meta.textures[ this.uuid ] = output;
+
+		}
 
 		return output;
 
@@ -210,8 +235,7 @@ Texture.prototype = {
 
 		if ( this.mapping !== UVMapping ) return;
 
-		uv.multiply( this.repeat );
-		uv.add( this.offset );
+		uv.applyMatrix3( this.matrix );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 
@@ -283,8 +307,17 @@ Texture.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( Texture.prototype, EventDispatcher.prototype );
+Object.defineProperty( Texture.prototype, "needsUpdate", {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
+
 
 export { Texture };

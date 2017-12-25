@@ -1,5 +1,5 @@
-import { Vector3 } from './Vector3';
-import { Sphere } from './Sphere';
+import { Vector3 } from './Vector3.js';
+import { Sphere } from './Sphere.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -13,9 +13,7 @@ function Box3( min, max ) {
 
 }
 
-Box3.prototype = {
-
-	constructor: Box3,
+Object.assign( Box3.prototype, {
 
 	isBox3: true,
 
@@ -57,6 +55,8 @@ Box3.prototype = {
 		this.min.set( minX, minY, minZ );
 		this.max.set( maxX, maxY, maxZ );
 
+		return this;
+
 	},
 
 	setFromBufferAttribute: function ( attribute ) {
@@ -87,6 +87,8 @@ Box3.prototype = {
 
 		this.min.set( minX, minY, minZ );
 		this.max.set( maxX, maxY, maxZ );
+
+		return this;
 
 	},
 
@@ -121,69 +123,13 @@ Box3.prototype = {
 
 	}(),
 
-	setFromObject: function () {
+	setFromObject: function ( object ) {
 
-		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and children's, world transforms
+		this.makeEmpty();
 
-		var v1 = new Vector3();
+		return this.expandByObject( object );
 
-		return function setFromObject( object ) {
-
-			var scope = this;
-
-			object.updateMatrixWorld( true );
-
-			this.makeEmpty();
-
-			object.traverse( function ( node ) {
-
-				var i, l;
-
-				var geometry = node.geometry;
-
-				if ( geometry !== undefined ) {
-
-					if ( geometry.isGeometry ) {
-
-						var vertices = geometry.vertices;
-
-						for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-							v1.copy( vertices[ i ] );
-							v1.applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
-
-					} else if ( geometry.isBufferGeometry ) {
-
-						var attribute = geometry.attributes.position;
-
-						if ( attribute !== undefined ) {
-
-							for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-								v1.fromAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-								scope.expandByPoint( v1 );
-
-							}
-
-						}
-
-					}
-
-				}
-
-			} );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	clone: function () {
 
@@ -258,6 +204,70 @@ Box3.prototype = {
 
 	},
 
+	expandByObject: function () {
+
+		// Computes the world-axis-aligned bounding box of an object (including its children),
+		// accounting for both the object's, and children's, world transforms
+
+		var scope, i, l;
+
+		var v1 = new Vector3();
+
+		function traverse( node ) {
+
+			var geometry = node.geometry;
+
+			if ( geometry !== undefined ) {
+
+				if ( geometry.isGeometry ) {
+
+					var vertices = geometry.vertices;
+
+					for ( i = 0, l = vertices.length; i < l; i ++ ) {
+
+						v1.copy( vertices[ i ] );
+						v1.applyMatrix4( node.matrixWorld );
+
+						scope.expandByPoint( v1 );
+
+					}
+
+				} else if ( geometry.isBufferGeometry ) {
+
+					var attribute = geometry.attributes.position;
+
+					if ( attribute !== undefined ) {
+
+						for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return function expandByObject( object ) {
+
+			scope = this;
+
+			object.updateMatrixWorld( true );
+
+			object.traverse( traverse );
+
+			return this;
+
+		};
+
+	}(),
+
 	containsPoint: function ( point ) {
 
 		return point.x < this.min.x || point.x > this.max.x ||
@@ -300,11 +310,9 @@ Box3.prototype = {
 
 	intersectsSphere: ( function () {
 
-		var closestPoint;
+		var closestPoint = new Vector3();
 
 		return function intersectsSphere( sphere ) {
-
-			if ( closestPoint === undefined ) closestPoint = new Vector3();
 
 			// Find the point on the AABB closest to the sphere center.
 			this.clampPoint( sphere.center, closestPoint );
@@ -407,7 +415,7 @@ Box3.prototype = {
 		this.max.min( box.max );
 
 		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
-		if( this.isEmpty() ) this.makeEmpty();
+		if ( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 
@@ -438,7 +446,7 @@ Box3.prototype = {
 		return function applyMatrix4( matrix ) {
 
 			// transform of empty box is an empty box.
-			if( this.isEmpty() ) return this;
+			if ( this.isEmpty() ) return this;
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
@@ -473,7 +481,7 @@ Box3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Box3 };

@@ -1,5 +1,5 @@
-import { Vector3 } from './Vector3';
-import { _Math } from './Math';
+import { Vector3 } from './Vector3.js';
+import { _Math } from './Math.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -12,9 +12,7 @@ function Line3( start, end ) {
 
 }
 
-Line3.prototype = {
-
-	constructor: Line3,
+Object.assign( Line3.prototype, {
 
 	set: function ( start, end ) {
 
@@ -126,7 +124,7 @@ Line3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Line3 };
